@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Data;
-using System.Linq;
-using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 
@@ -47,7 +44,7 @@ namespace OreTuner
 
             if (!Settings.BoulderOnTheSurface)
             {
-                harmony.Patch(AccessTools.Method(typeof(Chunk), "SetBlock", new Type[] { typeof(WorldBase), typeof(int), typeof(int), typeof(int), typeof(int), typeof(BlockValue), typeof(bool), typeof(bool) }),
+                harmony.Patch(AccessTools.Method(typeof(Chunk), "SetBlock", new Type[] { typeof(WorldBase), typeof(int), typeof(int), typeof(int), typeof(int), typeof(BlockValue), typeof(bool), typeof(bool), typeof(bool) }),
                     new HarmonyMethod(SymbolExtensions.GetMethodInfo((BlockValue _blockValue) => Chunk_SetBlock.Prefix(ref _blockValue))));
             }
 
@@ -90,7 +87,7 @@ namespace OreTuner
             }
             else
             {
-                Debug.LogError($"Mod {nameof(OreTuner)}: Was trying to get terrain height value before the height map generated.");
+                Debug.LogError($"Mod {nameof(OreTuner)}: Attempt to get terrain height value before the height map generated.");
             }
             return 0;
         }
@@ -184,7 +181,7 @@ namespace OreTuner
         /// </summary>
         public class Block_GetMapColor
         {
-            static Color prevColor = new Color(0.47f, 0.47f, 0.47f); // grey rock
+            static Color prevColor = new(0.47f, 0.47f, 0.47f); // grey rock
 
             public static void Postfix(Block __instance, ref Color __result)
             {

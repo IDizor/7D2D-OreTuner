@@ -10,7 +10,7 @@
     <RootNamespace>OreTuner</RootNamespace>
     <AssemblyName>OreTuner</AssemblyName>
     <LangVersion>11.0</LangVersion>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
