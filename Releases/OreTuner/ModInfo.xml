@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xml>
+	<Name value="Dizor_OreTuner" />
+	<DisplayName value="OreTuner" />
+	<Description value="Allows to limit the ore veins amount (%) on the surface. Optional: hide boulder, hide dot on the map." />
+	<Author value="Dizor" />
+	<Website value="https://github.com/IDizor/7D2D-OreTuner" />
+	<Version value="1.1" compat="A21"/>
+</xml>
