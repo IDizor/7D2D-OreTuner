@@ -28,12 +28,12 @@ namespace OreTuner
                 OreLimit = Settings.OreVeinsAmount / 100f;
                 if (Settings.OreVeinsAmount > 0)
                 {
-                    harmony.Patch(AccessTools.Constructor(typeof(HeightMap), new Type[] { typeof(int), typeof(int), typeof(float), typeof(ushort[]), typeof(int) }), null,
+                    harmony.Patch(AccessTools.Constructor(typeof(HeightMap), new Type[] { typeof(int), typeof(int), typeof(float), typeof(IBackedArray<ushort>), typeof(int) }), null,
                         new HarmonyMethod(SymbolExtensions.GetMethodInfo((HeightMap __instance) => HeightMap_Constructor.Postfix(__instance))));
                 }
 
-                harmony.Patch(AccessTools.Method(typeof(GameUtils), "GetOreNoiseAt"), null,
-                    new HarmonyMethod(SymbolExtensions.GetMethodInfo((GameUtils_GetOreNoiseAt_Postfix p) => GameUtils_GetOreNoiseAt.Postfix(ref p.__result, p._x, p._y, p._z))));
+                harmony.Patch(AccessTools.Method(typeof(GameUtils), nameof(GameUtils.GetOreNoiseAt)), null,
+                    new HarmonyMethod(SymbolExtensions.GetMethodInfo((GameUtils_GetOreNoiseAt.APostfix p) => GameUtils_GetOreNoiseAt.Postfix(ref p.__result, p._x, p._y, p._z))));
 
                 Debug.Log($"Mod {nameof(OreTuner)}: Ore veins limit applied: {Settings.OreVeinsAmount}%");
             }
@@ -44,34 +44,20 @@ namespace OreTuner
 
             if (!Settings.BoulderOnTheSurface)
             {
-                harmony.Patch(AccessTools.Method(typeof(Chunk), "SetBlock", new Type[] { typeof(WorldBase), typeof(int), typeof(int), typeof(int), typeof(int), typeof(BlockValue), typeof(bool), typeof(bool), typeof(bool) }),
+                harmony.Patch(AccessTools.Method(typeof(Chunk), nameof(Chunk.SetBlock), new Type[] { typeof(WorldBase), typeof(int), typeof(int), typeof(int), typeof(BlockValue), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(int) }),
                     new HarmonyMethod(SymbolExtensions.GetMethodInfo((BlockValue _blockValue) => Chunk_SetBlock.Prefix(ref _blockValue))));
             }
 
             if (!Settings.ColoredDotOnTheMap)
             {
-                harmony.Patch(AccessTools.Method(typeof(Block), "GetMapColor"), null,
-                    new HarmonyMethod(SymbolExtensions.GetMethodInfo((Block_GetMapColor_Postfix p) => Block_GetMapColor.Postfix(p.__instance, ref p.__result))));
+                harmony.Patch(AccessTools.Method(typeof(Block), nameof(Block.GetMapColor)), null,
+                    new HarmonyMethod(SymbolExtensions.GetMethodInfo((Block_GetMapColor.APostfix p) => Block_GetMapColor.Postfix(p.__instance, ref p.__result))));
             }
 
             harmony.PatchAll();
         }
 
         private static float OreLimit = 1.0f;
-
-        private struct GameUtils_GetOreNoiseAt_Postfix
-        {
-            public float __result;
-            public int _x;
-            public int _y;
-            public int _z;
-        }
-
-        private struct Block_GetMapColor_Postfix
-        {
-            public Block __instance;
-            public Color __result;
-        }
 
         /// <summary>
         /// Gets the height of the terrain at the specified world coordinates.
@@ -95,7 +81,7 @@ namespace OreTuner
         /// <summary>
         /// Keeps height map reference.
         /// </summary>
-        public class HeightMap_Constructor
+        public static class HeightMap_Constructor
         {
             public static HeightMap HeightMap = null;
             public static int OffsetX;
@@ -112,11 +98,19 @@ namespace OreTuner
         /// <summary>
         /// Prevents ore veins to reach surface depending on % chance from settings.
         /// </summary>
-        public class GameUtils_GetOreNoiseAt
+        public static class GameUtils_GetOreNoiseAt
         {
             static Vector2i prevChunk = Vector2i.zero;
             static int prevChunkHeight = 0;
             static Vector2 prevOrePos = Vector2.zero;
+
+            public struct APostfix
+            {
+                public float __result;
+                public int _x;
+                public int _y;
+                public int _z;
+            }
 
             public static void Postfix(ref float __result, int _x, int _y, int _z)
             {
@@ -167,7 +161,7 @@ namespace OreTuner
         /// <summary>
         /// Prevents placing ore boulders.
         /// </summary>
-        public class Chunk_SetBlock
+        public static class Chunk_SetBlock
         {
             public static bool Prefix(ref BlockValue _blockValue)
             {
@@ -179,9 +173,15 @@ namespace OreTuner
         /// <summary>
         /// Prevents using ore colors on the map.
         /// </summary>
-        public class Block_GetMapColor
+        public static class Block_GetMapColor
         {
             static Color prevColor = new(0.47f, 0.47f, 0.47f); // grey rock
+
+            public struct APostfix
+            {
+                public Block __instance;
+                public Color __result;
+            }
 
             public static void Postfix(Block __instance, ref Color __result)
             {
